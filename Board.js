@@ -1,16 +1,19 @@
+const readlineSync = require('readline-sync');
+
 class Board {
 
     board;
     corners;
     playerPositions;
     currentDirection;
-    isFood = false; // tells if the food is present on the board
+    isFood; // tells if the food is present on the board
 
     constructor(){
+        this.isFood = false;
         this.board = []; 
         this.corners = []; // this will be exported too to make easier the game controllers since we have established the edges
         this.playerPositions = [] // positions occupied by the player
-        this.currentDirection = "R"; // right is the default direction
+        this.currentDirection = "d"; // right is the default direction
 
         // basic 20x20 matrix
         for (let i = 0; i < 20; i++) {
@@ -34,7 +37,6 @@ class Board {
             }
         }
         this.genFood();
-        this.isFood = true; 
     }
 
     stringify(){
@@ -51,13 +53,13 @@ class Board {
 
     start(){
         // actual gameplay
-        setInterval(() => {
+        while(true){
             console.clear();
             console.log(this.stringify()); // prints current position
-            // user input
+            this.userInput(); // take the input and make the move
             this.checkGameOver();
             this.genFood(); // check if the food is been eaten
-        }, 500)
+        }
     }
 
     genFood(){
@@ -70,7 +72,8 @@ class Board {
             x = Math.floor(Math.random() * (18 - 2 + 1)) + 2;
             y = Math.floor(Math.random() * (18 - 2 + 1)) + 2;
         }
-        this.board[x][y] = "@"
+        this.board[x][y] = "@";
+        this.isFood = true;
     }
 
     checkGameOver(){
@@ -80,17 +83,72 @@ class Board {
     move(direction){
         // is taken for granted that a player can't move in the opposite direction but only in the other three
         switch(direction){
-            // to do
-            case "R":
-                break;
-            case "L":
-                break;
-            case "U":
-                break;
-            case "D":
-                break;  
+            case "w":
+                if(this.currentDirection === "s") break;
+                // if there is just the head
+                if(this.playerPositions.length === 1){
+                    let pos = this.playerPositions[0];
+                    this.board[pos[0]][pos[1]] = " ";
+                    pos = [--pos[0], pos[1]];
+                    this.playerPositions[0] = [pos[0], pos[1]];
+                    this.board[pos[0]][pos[1]] = "^";
+                    this.currentDirection = "w";
+                    break;
+                }
+
+            case "a":
+                if(this.currentDirection === "d") break;
+                //if the snake ate an apple 
+                
+                // if there is just the head
+                if(this.playerPositions.length === 1){
+                    let pos = this.playerPositions[0];
+                    this.board[pos[0]][pos[1]] = " ";
+                    pos = [pos[0], --pos[1]];
+                    this.playerPositions[0] = [pos[0], pos[1]];
+                    this.board[pos[0]][pos[1]] = "<";
+                    this.currentDirection = "a";
+                    break;
+                }
+
+            case "s":
+                if(this.currentDirection === "w") break;
+                // if there is just the head
+                if(this.playerPositions.length === 1){
+                    let pos = this.playerPositions[0];
+                    this.board[pos[0]][pos[1]] = " ";
+                    pos = [++pos[0], pos[1]];
+                    this.playerPositions[0] = [pos[0], pos[1]];
+                    this.board[pos[0]][pos[1]] = "v";
+                    this.currentDirection = "s";
+                    break;
+                } 
+
+            case "d":
+                if(this.currentDirection === "a") break;
+                // if there is just the head
+                if(this.playerPositions.length === 1){
+                    let pos = this.playerPositions[0];
+                    this.board[pos[0]][pos[1]] = " ";
+                    pos = [pos[0], ++pos[1]];
+                    this.playerPositions[0] = [pos[0], pos[1]];
+                    this.board[pos[0]][pos[1]] = ">";
+                    this.currentDirection = "d";
+                    break;
+                }
+                
         }
     }
+
+    userInput() {
+        let input;
+        input = readlineSync.question('Make a move (WASD): ');
+        if (input !== "w" &&  input !== "a" && input !== "s" && input !== "d") {
+          console.log('Invalid input. Please enter a valid input.');
+          this.userInput();
+        }
+        else this.move(input);
+      }
 }
 
 module.exports = {

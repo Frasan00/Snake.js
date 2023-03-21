@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/Frasan00/Snake.js/issues"
   },
-  "homepage": "https://github.com/Frasan00/Snake.js#readme"
+  "homepage": "https://github.com/Frasan00/Snake.js#readme",
+  "dependencies": {
+    "readline-sync": "^1.4.10"
+  }
 }
