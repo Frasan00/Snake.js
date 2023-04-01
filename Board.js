@@ -1,5 +1,7 @@
 const readlineSync = require('readline-sync');
 
+process.stdin.setRawMode();
+
 class Board {
 
     score;
@@ -8,6 +10,7 @@ class Board {
     currentDirection;
     isFood; // tells if the food is present on the board
     gameOver;
+
 
     constructor(){
         this.score = -1;
@@ -76,15 +79,16 @@ class Board {
         // actual gameplay
         while(this.gameOver === false){
             console.clear();
-            console.log("Player positions: ",this.playerPositions);
+            console.log('*** Snake.js ***\n');
             console.log("Score: "+this.score);
             this.render();
             console.log(this.stringify()); // prints current position
-            this.userInput(); // take the input and make the move
+            this.userInput(); // takes the input and make the move
             this.checkGameOver();
-            this.genFood(); // check if the food is been eaten
+            this.genFood(); // checks if the food is been eaten
         }
         console.log("Game over! Thanks for playing!");
+        return;
     }
 
     genFood(){
@@ -106,7 +110,7 @@ class Board {
         // corners check
         const head = [this.playerPositions[0][0], this.playerPositions[0][1]];
         if (head[0] === 0 || head[0] === 19) this.gameOver = true;
-        else if (head[1] === 0 || head[1] === 19) this.gameOver = true;  
+        else if (head[1] === 0 || head[1] === 19) this.gameOver = true;
 
         // body check
         for(let i = 1; i < this.playerPositions.length; i++){
@@ -286,20 +290,22 @@ class Board {
                     break;
                 }
             
-            case "exit":
+            case "x":
                 this.gameOver = true;
+            
+            default:
+                ""
+            process.exit();
         }
     }
 
     userInput() {
-        let input;
-        input = readlineSync.question('Make a move (WASD) or exit: ');
-        if (input !== "w" &&  input !== "a" && input !== "s" && input !== "d" && input !== "exit") {
-          console.log('Invalid input. Please enter a valid input.');
-          this.userInput();
-        }
-        else this.move(input);
-      }
+        console.log('Use WASD to move and X to exit');
+        // if the player hasn't made any move, it's automatically moved in the current direction
+        const key = readlineSync.keyIn('', { hideEchoBack: true, mask: '' });
+        this.move(key);
+    }
+
 }
 
 module.exports = {
